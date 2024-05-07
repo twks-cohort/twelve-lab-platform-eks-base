@@ -1,7 +1,7 @@
 
 {
-  "title": "EMPC lab-platform-eks-base",
-  "description": "[lab-platform-eks-base](https://github.com/ThoughtWorks-DPS/lab-platform-eks-base)",
+  "title": "EMPC twelve-lab-platform-eks-base",
+  "description": "[twelve-lab-platform-eks-base](https://github.com/twks-cohort/twelve-lab-platform-eks-base)",
   "widgets": [
     {
       "definition": {
@@ -239,7 +239,7 @@
         "display_format": "countsAndList",
         "color_preference": "text",
         "hide_zero_counts": true,
-        "query": "tag:pipeline:lab-platform-eks-base",
+        "query": "tag:pipeline:twelve-lab-platform-eks-base",
         "sort": "status,asc",
         "count": 50,
         "start": 0,
@@ -1312,10 +1312,10 @@
   "template_variables": [
     {
       "name": "cluster",
-      "default": "sandbox-us-east-2",
+      "default": "sandbox-ap-southeast-2",
       "prefix": "cluster",
       "available_values": [
-        "sandbox-us-east-2",
+        "sandbox-ap-southeast-2",
         "prod-us-east-1"
       ]
     },

@@ -4,7 +4,7 @@ set -e
 function version_alert() {
   export TABLE_COLOR=$ALERT_TABLE_COLOR
   # every 7 days, also send a slack message
-  if (( "$(date +%d)" % 7 )); then
+  if (("$(date +%d)" % 7)); then
     export payload="{'text': '$1' }"
     curl -X POST -H 'Content-type: application/json' --data "$payload" $LAB_EVENTS_CHANNEL_WEBHOOK
   fi
@@ -15,14 +15,14 @@ export AWS_ASSUME_ROLE=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_assume_rol
 export AWS_DEFAULT_REGION=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_region)
 export AWS_ACCOUNT_ID=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_account_id)
 
-aws sts assume-role --output json --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/$AWS_ASSUME_ROLE --role-session-name lab-platform-eks-base > credentials
+aws sts assume-role --output json --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/$AWS_ASSUME_ROLE --role-session-name twelve-lab-platform-eks-base >credentials
 
 export AWS_ACCESS_KEY_ID=$(cat credentials | jq -r ".Credentials.AccessKeyId")
 export AWS_SECRET_ACCESS_KEY=$(cat credentials | jq -r ".Credentials.SecretAccessKey")
 export AWS_SESSION_TOKEN=$(cat credentials | jq -r ".Credentials.SessionToken")
 
 # current versions table
-export TABLE="| dependency | sandbox-us-east-2 | prod-us-east-1 |\\\\n|----|----|----|\\\\n"
+export TABLE="| dependency | sandbox-ap-southeast-2 | prod-us-east-1 |\\\\n|----|----|----|\\\\n"
 export EKS_VERSIONS="| eks |"
 export AMI_VERSIONS="| ami |"
 export COREDNS_VERSIONS="| coredns |"
@@ -30,11 +30,10 @@ export KUBE_PROXY_VERSIONS="| kube-proxy |"
 export VPC_CNI_VERSIONS="| vpc-cni |"
 export EBS_CSI_VERSIONS="| ebs-csi |"
 
-echo "generate markdown table with the desired versions of the services managed by the lab-platform-eks-base pipeline for all clusters"
-declare -a clusters=(sandbox-us-east-2 prod-us-east-1)
+echo "generate markdown table with the desired versions of the services managed by the twelve-lab-platform-eks-base pipeline for all clusters"
+declare -a clusters=(sandbox-ap-southeast-2 prod-us-east-1)
 
-for cluster in "${clusters[@]}";
-do
+for cluster in "${clusters[@]}"; do
   echo "cluster: $cluster"
 
   # append environment EKS version
@@ -49,9 +48,9 @@ do
   if [[ $CURRENT_AMI_VERSION == "null" ]]; then
     export CURRENT_AMI_VERSION="-"
   fi
-  if [[ $cluster == "sandbox-us-east-2" ]]; then
+  if [[ $cluster == "sandbox-ap-southeast-2" ]]; then
     export VERSION_CHECK_AMI=$CURRENT_AMI_VERSION
- fi
+  fi
   export AMI_VERSIONS="$AMI_VERSIONS ${CURRENT_AMI_VERSION:-} |"
   echo "CURRENT_AMI_VERSION: $CURRENT_AMI_VERSION"
 
@@ -89,7 +88,7 @@ declare KUBE_PROXY_VERSIONS="|"
 declare VPC_CNI_VERSIONS="|"
 declare EBS_CSI_VERSIONS="|"
 
-echo "generate markdown table with the available versions of the services managed by the lab-platform-eks-base pipeline for all clusters"
+echo "generate markdown table with the available versions of the services managed by the twelve-lab-platform-eks-base pipeline for all clusters"
 
 export LATEST_EKS_VERSION=$(aws eks describe-addon-versions | jq -r ".addons[] | .addonVersions[] | .compatibilities[] | .clusterVersion" | sort | uniq | tail -n1)
 export EKS_VERSIONS="$EKS_VERSIONS $LATEST_EKS_VERSION |"

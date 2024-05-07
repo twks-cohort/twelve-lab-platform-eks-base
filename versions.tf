@@ -8,9 +8,9 @@ terraform {
 
   backend "remote" {
     hostname     = "app.terraform.io"
-    organization = "twdps"
+    organization = "cohorts"
     workspaces {
-      prefix = "lab-platform-eks-base-"
+      prefix = "twelve-lab-platform-eks-base-"
     }
   }
 }
@@ -19,14 +19,14 @@ provider "aws" {
   region = var.aws_region
   assume_role {
     role_arn     = local.authentication_role
-    session_name = "lab-platform-eks-base"
+    session_name = "twelve-lab-platform-eks-base"
   }
 
   default_tags {
     tags = {
       env      = var.cluster_name
       cluster  = var.cluster_name
-      pipeline = "lab-platform-eks-base"
+      pipeline = "twelve-lab-platform-eks-base"
     }
   }
 }
