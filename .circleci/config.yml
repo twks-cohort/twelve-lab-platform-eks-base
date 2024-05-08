@@ -2,10 +2,10 @@
 version: 2.1
 
 orbs:
-  terraform: cohorts/terraform@0.6.0
-  kube: cohorts/kube-ops@0.3.0
-  op: cohorts/onepassword@1.0.0
-  do: cohorts/pipeline-events@0.1.0
+  terraform: twdps/terraform@0.6.0
+  kube: twdps/kube-ops@0.3.0
+  op: twdps/onepassword@1.0.0
+  do: twdps/pipeline-events@0.1.0
 
 # ==== global pipeline parameters
 
@@ -13,7 +13,7 @@ parameters:
   context:
     description: circleci context for all jobs
     type: string
-    default: cohorts
+    default: cohorts-global
   terraform-version:
     description: terraform version for all jobs
     type: string
@@ -21,7 +21,7 @@ parameters:
   executor-image:
     description: image to use for terraform runs
     type: string
-    default: cohorts/circleci-kube-ops:alpine-0.8.0
+    default: twdps/circleci-kube-ops:alpine-0.8.0
 
 # ==== triggers
 
