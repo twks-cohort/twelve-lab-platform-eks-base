@@ -7,3 +7,5 @@ terrform.*
 Pipfile.lock
 credentials
 *.ignore
+
+.idea
