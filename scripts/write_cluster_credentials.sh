@@ -11,14 +11,16 @@ export AWS_SECRET_ACCESS_KEY=$(cat credentials | jq -r ".Credentials.SecretAcces
 export AWS_SESSION_TOKEN=$(cat credentials | jq -r ".Credentials.SessionToken")
 
 # terraform-aws-eks module v17 method
-cat kubeconfig_$CLUSTER | opw write platform-${CLUSTER} kubeconfig -
+kube_config=$(cat kubeconfig_${CLUSTER})
+op item edit "twelve-platform-${CLUSTER}" --vault cohorts kubeconfig=$kube_config
 
 # terraform-aws-eks module v18 method
 # terraform output kubeconfig | grep -v "EOT" | opw write platform-${CLUSTER} kubeconfig -
 
 # write cluster url and pubic certificate to 1password
-terraform output cluster_endpoint | tr -d \\n | sed 's/"//g' | opw write platform-${CLUSTER} cluster-endpoint -
-terraform output cluster_certificate_authority_data | tr -d \\n | sed 's/"//g' | opw write platform-${CLUSTER} base64-certificate-authority-data -
+cluster_endpoint=$(terraform output cluster_endpoint | tr -d \\n | sed 's/"//g')
+base64_certificate_authority_data=$(terraform output cluster_certificate_authority_data | tr -d \\n | sed 's/"//g')
+op item edit "twelve-platform-${CLUSTER}" --vault cohorts cluster-endpoint=$cluster_endpoint base64-certificate-authority-data=$base64_certificate_authority_data
 
 # platform-sandbox-ap-southeast-2
 # platform-prod-us-east-1

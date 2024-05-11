@@ -21,7 +21,7 @@ parameters:
   executor-image:
     description: image to use for terraform runs
     type: string
-    default: twdps/circleci-kube-ops:alpine-0.8.0
+    default: twdps/circleci-kube-ops:alpine-edge
 
 # ==== triggers
 
@@ -152,7 +152,7 @@ jobs:
           benchmark: eks
           namespace: default
 
-  # compare desired eks component verions with current release versions
+  # compare desired eks component versions with current release versions
   version-check:
     parameters:
       cluster:
@@ -256,7 +256,6 @@ jobs:
           source-env: << parameters.source-env >>
       - set-kubeconfig:
           cluster: << parameters.cluster >>
-      - do/circle-deploy
       - run:
           name: replace the oldest 1/4 of the nodes in the clister
           command: bash scripts/replace_nodes.sh << parameters.cluster >>
@@ -308,7 +307,6 @@ workflows:
                 command: |
                   export KUBECONFIG=kubeconfig_sandbox-ap-southeast-2
                   kubectl apply -f lab-system-namespace.yaml
-            - do/circle-deploy
           requires:
             - approve sandbox-ap-southeast-2 changes
           filters: *on-push-main
@@ -322,65 +320,6 @@ workflows:
           requires:
             - apply sandbox-ap-southeast-2 changes
           filters: *on-push-main
-
-  # release eks-base to prod-us-east-1:
-  #   jobs:
-  #     - terraform/plan:
-  #         name: prod-us-east-1 change plan
-  #         context: << pipeline.parameters.context >>
-  #         shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
-  #         workspace: prod-us-east-1
-  #         terraform-version: << pipeline.parameters.terraform-version >>
-  #         before-terraform:
-  #           - set-environment:
-  #               cluster: prod-us-east-1
-  #               source-env: op.prod.env
-  #         filters: *on-tag-main
-
-  #     - approve prod-us-east-1 changes:
-  #         type: approval
-  #         requires:
-  #           - prod-us-east-1 change plan
-  #         filters: *on-tag-main
-
-  #     - terraform/apply:
-  #         name: apply prod-us-east-1 changes
-  #         context: << pipeline.parameters.context >>
-  #         shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
-  #         workspace: prod-us-east-1
-  #         terraform-version: << pipeline.parameters.terraform-version >>
-  #         before-terraform:
-  #           - set-environment:
-  #               cluster: prod-us-east-1
-  #               source-env: op.prod.env
-  #         after-terraform-init:
-  #           - taint-node-group:
-  #               node-group: group-a
-  #         after-terraform:
-  #           - store-system-credentials:
-  #               cluster: prod-us-east-1
-  #           - kube/packages:
-  #               use-sudo: true
-  #               kubectl-version: 1.23.5
-  #           - run:
-  #               name: create lab-system namespace
-  #               command: |
-  #                 export KUBECONFIG=kubeconfig_prod-us-east-1
-  #                 kubectl apply -f lab-system-namespace.yaml
-  #           - do/circle-deploy
-  #         requires:
-  #           - approve prod-us-east-1 changes
-  #         filters: *on-tag-main
-
-  #     - validate-eks:
-  #         name: validate prod-us-east-1 eks cluster
-  #         context: << pipeline.parameters.context >>
-  #         shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
-  #         source-env: op.prod.env
-  #         cluster: prod-us-east-1
-  #         requires:
-  #           - apply prod-us-east-1 changes
-  #         filters: *on-tag-main
 
   # generate release notes:
   #   jobs:
@@ -400,22 +339,6 @@ workflows:
           source-env: op.nonprod.env
           cluster: sandbox-ap-southeast-2
           filters: *on-push-main
-
-      # - approve prod-us-east-1 monitors:
-      #     type: approval
-      #     requires:
-      #       - update sandbox-ap-southeast-2 monitors
-      #     filters: *on-push-main
-
-      # - update-monitors:
-      #     name: update prod-us-east-1 monitors
-      #     context: << pipeline.parameters.context >>
-      #     shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
-      #     source-env: op.prod.env
-      #     cluster: prod-us-east-1
-      #     requires:
-      #       - approve prod-us-east-1 monitors
-      #     filters: *on-push-main
 
   update dashboard:
     jobs:
@@ -439,15 +362,8 @@ workflows:
           context: << pipeline.parameters.context >>
           cluster: sandbox-ap-southeast-2
           source-env: op.nonprod.env
-      # - replace-nodes:
-      #     name: nightly node replacement job on prod-us-east-1
-      #     context: << pipeline.parameters.context >>
-      #     cluster: prod-us-east-1
-      #     source-env: op.prod.env
-      #     requires:
-      #       - nightly node replacement job on sandbox-ap-southeast-2
 
-  # perform the pipeline health checks and compare desired eks component verions with current release versions
+  # perform the pipeline health checks and compare desired eks component versions with current release versions
   nightly-validation:
     triggers:
       - schedule:
@@ -467,9 +383,3 @@ workflows:
           shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
           source-env: op.nonprod.env
           cluster: sandbox-ap-southeast-2
-      # - validate-eks:
-      #     name: validate prod-us-east-1 eks cluster
-      #     context: << pipeline.parameters.context >>
-      #     shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
-      #     source-env: op.prod.env
-      #     cluster: prod-us-east-1
