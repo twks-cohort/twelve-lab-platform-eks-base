@@ -330,23 +330,23 @@ workflows:
   #         on-tag: true
   #         filters: *on-tag-main
 
-  update monitors:
-    jobs:
-      - update-monitors:
-          name: update sandbox-ap-southeast-2 monitors
-          context: << pipeline.parameters.context >>
-          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
-          source-env: op.nonprod.env
-          cluster: sandbox-ap-southeast-2
-          filters: *on-push-main
-
-  update dashboard:
-    jobs:
-      - update-dashboard:
-          name: update dashboard
-          context: << pipeline.parameters.context >>
-          shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
-          filters: *on-push-main
+#  update monitors:
+#    jobs:
+#      - update-monitors:
+#          name: update sandbox-ap-southeast-2 monitors
+#          context: << pipeline.parameters.context >>
+#          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+#          source-env: op.nonprod.env
+#          cluster: sandbox-ap-southeast-2
+#          filters: *on-push-main
+#
+#  update dashboard:
+#    jobs:
+#      - update-dashboard:
+#          name: update dashboard
+#          context: << pipeline.parameters.context >>
+#          shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
+#          filters: *on-push-main
 
   nightly-node-replacements:
     triggers:
@@ -373,10 +373,10 @@ workflows:
               only:
                 - main
     jobs:
-      - update-dashboard:
-          name: update dashboard
-          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
-          context: << pipeline.parameters.context >>
+#      - update-dashboard:
+#          name: update dashboard
+#          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+#          context: << pipeline.parameters.context >>
       - validate-eks:
           name: validate sandbox-ap-southeast-2 eks cluster
           context: << pipeline.parameters.context >>
