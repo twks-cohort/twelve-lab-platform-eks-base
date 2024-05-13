@@ -16,6 +16,7 @@ variable "coredns_version" {}
 variable "kube_proxy_version" {}
 variable "aws_ebs_csi_version" {}
 variable "alert_channel" {}
+variable "kube_proxy_version_test" {}
 
 variable "default_node_group_name" {}
 variable "default_node_group_ami_type" {}
