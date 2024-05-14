@@ -293,9 +293,9 @@ workflows:
             - set-environment:
                 cluster: sandbox-ap-southeast-2
                 source-env: op.nonprod.env
-#          after-terraform-init:
-#            - taint-node-group:
-#                node-group: group-a
+          after-terraform-init:
+            - taint-node-group:
+                node-group: group-a
           after-terraform:
             - store-system-credentials:
                 cluster: sandbox-ap-southeast-2
