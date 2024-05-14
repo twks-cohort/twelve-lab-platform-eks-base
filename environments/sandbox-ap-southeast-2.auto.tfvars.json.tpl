@@ -8,7 +8,7 @@
     "cluster_enabled_log_types": ["api", "audit", "authenticator", "controllerManager", "scheduler"],
     "cluster_log_retention": "30",
     "vpc_cni_version": "v1.11.4-eksbuild.1",
-    "coredns_version": "v1.8.7-eksbuild.10",
+    "coredns_version": "v1.8.7-eksbuild.2",
     "kube_proxy_version": "v1.23.8-eksbuild.2",
     "kube_proxy_version_test": "v1.23.8-minimal-eksbuild.2",
     "aws_ebs_csi_version": "v1.11.4-eksbuild.1",
@@ -22,7 +22,7 @@
     "default_node_group_desired_size": "3",
     "default_node_group_disk_size": "50",
     "default_node_group_capacity_type": "SPOT",
-    "default_node_group_instance_types": ["t2.2xlarge","t3.2xlarge","t3a.2xlarge","m5n.2xlarge","m5.2xlarge","m4.2xlarge"],
+    "default_node_group_instance_types": ["t2.2xlarge","t3.2xlarge","t3a.2xlarge","m5.2xlarge","m4.2xlarge"],
 
     "oidc_client_id": "{{ op://cohorts/svc-auth0/dev-7tdrknx0bmqdexpg-dev-team-pti2-dpsctl-client-id }}",
     "oidc_groups_claim": "https://github.com/orgs/twks-cohort/teams/twelve",
