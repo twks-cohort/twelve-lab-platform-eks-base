@@ -303,7 +303,7 @@ workflows:
                 use-sudo: true
                 kubectl-version: 1.23.5
             - run:
-                name: create twelve-lab-system namespace
+                name: create lab-system namespace
                 command: |
                   export KUBECONFIG=kubeconfig_sandbox-ap-southeast-2
                   kubectl apply -f lab-system-namespace.yaml

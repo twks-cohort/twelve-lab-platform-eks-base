@@ -3,7 +3,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: test-ebs-claim
-  namespace: twelve-lab-system
+  namespace: lab-system
 spec:
   accessModes:
     - ReadWriteOnce
@@ -17,7 +17,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: claim-test-pod
-  namespace: twelve-lab-system
+  namespace: lab-system
 spec:
   containers:
     - name: claim-test-pod
