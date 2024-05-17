@@ -2,7 +2,7 @@ resource "aws_eks_addon" "vpc_cni" {
   cluster_name             = var.cluster_name
   addon_name               = "vpc-cni"
   addon_version            = var.vpc_cni_version
-  resolve_conflicts        = "OVERWRITE"
+#  resolve_conflicts        = "OVERWRITE"
   service_account_role_arn = module.vpc_cni_irsa.iam_role_arn
 
   depends_on = [ module.eks.cluster_id ]

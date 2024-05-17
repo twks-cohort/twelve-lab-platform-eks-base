@@ -2,7 +2,7 @@ resource "aws_eks_addon" "ebs_csi_driver" {
   cluster_name             = var.cluster_name
   addon_name               = "aws-ebs-csi-driver"
   addon_version            = var.aws_ebs_csi_version
-  resolve_conflicts        = "OVERWRITE"
+#  resolve_conflicts        = "OVERWRITE"
   service_account_role_arn = module.ebs_csi_irsa.iam_role_arn
 
   depends_on = [ module.eks.cluster_id ]
