@@ -24,8 +24,8 @@
     "default_node_group_capacity_type": "SPOT",
     "default_node_group_instance_types": ["t2.2xlarge","t3.2xlarge","t3a.2xlarge","m5.2xlarge","m4.2xlarge"],
 
-    "oidc_client_id": "{{ op://cohorts/svc-auth0/dev-7tdrknx0bmqdexpg-dev-team-pti2-dpsctl-client-id }}",
-    "oidc_groups_claim": "https://github.com/orgs/twks-cohort/teams/twelve",
+    "oidc_client_id": "{{ op://cohorts/team-twelve-svc-auth0/dev-8zg3kpi25tnc00ds-dev-dpsctl-client-id }}",
+    "oidc_groups_claim": "https://github.com/orgs/twks-cohort/teams",
     "oidc_identity_provider_config_name": "Auth0",
-    "oidc_issuer_url": "https://dev-cohortsio.us.auth0.com/"
+    "oidc_issuer_url": "https://dev-8zg3kpi25tnc00ds.us.auth0.com"
 }
