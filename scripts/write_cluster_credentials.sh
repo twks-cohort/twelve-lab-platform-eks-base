@@ -23,7 +23,7 @@ cluster_endpoint=$(terraform output cluster_endpoint | tr -d \\n | sed 's/"//g')
 base64_certificate_authority_data=$(terraform output cluster_certificate_authority_data | tr -d \\n | sed 's/"//g')
 op item edit "twelve-platform-${CLUSTER}" --vault cohorts cluster-endpoint[password]=$cluster_endpoint base64-certificate-authority-data[password]=$base64_certificate_authority_data
 
-# platform-sandbox-ap-southeast-2
+# platform-nonprod-ap-southeast-2
 # platform-prod-us-east-1
 # terraform output DPSNonprodServiceAccount_encrypted_aws_secret_access_key | sed 's/"//g' | base64 -d | gpg -dq --passphrase ${GPG_KEY_PASSPHRASE} |  opw write twelve-aws DPSNonprodServiceAccount-aws-secret-access-key -
 # terraform output DPSNonprodServiceAccount_aws_access_key_id | tr -d \\n | sed 's/"//g' | opw write twelve-aws DPSNonprodServiceAccount-aws-access-key-id -

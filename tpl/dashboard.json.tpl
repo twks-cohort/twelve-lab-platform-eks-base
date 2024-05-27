@@ -1312,10 +1312,10 @@
   "template_variables": [
     {
       "name": "cluster",
-      "default": "sandbox-ap-southeast-2",
+      "default": "nonprod-ap-southeast-2",
       "prefix": "cluster",
       "available_values": [
-        "sandbox-ap-southeast-2",
+        "nonprod-ap-southeast-2",
         "prod-us-east-1"
       ]
     },

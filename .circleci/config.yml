@@ -180,59 +180,6 @@ jobs:
           name: validate addon and managed node group ami versions
           command: bash scripts/check_eks_and_addon_versions.sh << parameters.cluster >>
 
-  # update cluster specific monitors
-#  update-monitors:
-#    parameters:
-#      cluster:
-#        description: cluster monitors to update
-#        type: string
-#      shell:
-#        description: shell options
-#        type: string
-#        default: /bin/bash -eo pipefail
-#      source-env:
-#        description: .env file to source into BASH_ENV
-#        type: string
-#    docker:
-#      - image: << pipeline.parameters.executor-image >>
-#    shell: << parameters.shell >>
-#    steps:
-#      - checkout
-#      - setup_remote_docker
-#      - set-environment:
-#          source-env: << parameters.source-env >>
-#          cluster: << parameters.cluster >>
-#      - run:
-#          name: install requirements
-#          command: pip install -r requirements.txt
-#      - run:
-#          name: update datadog eks-base monitors
-#          command: python scripts/deploy_monitors.py << parameters.cluster >> $(cat << parameters.cluster >>.auto.tfvars.json | jq -r .default_node_group_desired_size) $(cat << parameters.cluster >>.auto.tfvars.json | jq -r .alert_channel)
-
-  # update multi-cluster dashboard. Only needs to deploy once for many envs.
-#  update-dashboard:
-#    parameters:
-#      shell:
-#        description: shell options
-#        type: string
-#        default: /bin/bash -eo pipefail
-#    docker:
-#      - image: << pipeline.parameters.executor-image >>
-#    shell: << parameters.shell >>
-#    steps:
-#      - checkout
-#      - setup_remote_docker
-#      - set-environment:
-#          source-env: op.nonprod.env
-#          cluster: sandbox-ap-southeast-2
-#      - run:
-#          name: install requirements
-#          command: pip install -r requirements.txt
-#      - run:
-#          name: update datadog eks-base dashboard
-#          command: bash scripts/deploy_dashboard.sh sandbox-ap-southeast-2
-
-  # replace the oldest 1/4 of the nodes in the cluster
   replace-nodes:
     parameters:
       cluster:
@@ -263,90 +210,63 @@ jobs:
 workflows:
   version: 2
 
-  deploy eks-base to sandbox-ap-southeast-2:
+  deploy eks-base to nonprod-ap-southeast-2:
     jobs:
       - terraform/plan:
-          name: sandbox-ap-southeast-2 change plan
+          name: nonprod-ap-southeast-2 change plan
           context: << pipeline.parameters.context >>
           shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
-          workspace: sandbox-ap-southeast-2
+          workspace: nonprod-ap-southeast-2
           terraform-version: << pipeline.parameters.terraform-version >>
           before-terraform:
             - set-environment:
-                cluster: sandbox-ap-southeast-2
+                cluster: nonprod-ap-southeast-2
                 source-env: op.nonprod.env
           filters: *on-push-main
 
-      - approve sandbox-ap-southeast-2 changes:
+      - approve nonprod-ap-southeast-2 changes:
           type: approval
           requires:
-            - sandbox-ap-southeast-2 change plan
+            - nonprod-ap-southeast-2 change plan
           filters: *on-push-main
 
       - terraform/apply:
-          name: apply sandbox-ap-southeast-2 changes
+          name: apply nonprod-ap-southeast-2 changes
           context: << pipeline.parameters.context >>
           shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
-          workspace: sandbox-ap-southeast-2
+          workspace: nonprod-ap-southeast-2
           terraform-version: << pipeline.parameters.terraform-version >>
           before-terraform:
             - set-environment:
-                cluster: sandbox-ap-southeast-2
+                cluster: nonprod-ap-southeast-2
                 source-env: op.nonprod.env
           after-terraform-init:
             - taint-node-group:
                 node-group: group-a
           after-terraform:
             - store-system-credentials:
-                cluster: sandbox-ap-southeast-2
+                cluster: nonprod-ap-southeast-2
             - kube/packages:
                 use-sudo: true
                 kubectl-version: 1.23.5
             - run:
                 name: create lab-system namespace
                 command: |
-                  export KUBECONFIG=kubeconfig_sandbox-ap-southeast-2
+                  export KUBECONFIG=kubeconfig_nonprod-ap-southeast-2
                   kubectl apply -f lab-system-namespace.yaml
           requires:
-            - approve sandbox-ap-southeast-2 changes
+            - approve nonprod-ap-southeast-2 changes
           filters: *on-push-main
 
       - validate-eks:
-          name: validate sandbox-ap-southeast-2 eks cluster
+          name: validate nonprod-ap-southeast-2 eks cluster
           context: << pipeline.parameters.context >>
           shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
           source-env: op.nonprod.env
-          cluster: sandbox-ap-southeast-2
+          cluster: nonprod-ap-southeast-2
           requires:
-            - apply sandbox-ap-southeast-2 changes
+            - apply nonprod-ap-southeast-2 changes
           filters: *on-push-main
-
-  # generate release notes:
-  #   jobs:
-  #     - executor-tools/release:
-  #         name: generate release notes for eks-base production release
-  #         context: << pipeline.parameters.context >>
-  #         shell: << pipeline.parameters.shell-options >>
-  #         on-tag: true
-  #         filters: *on-tag-main
-
-#  update monitors:
-#    jobs:
-#      - update-monitors:
-#          name: update sandbox-ap-southeast-2 monitors
-#          context: << pipeline.parameters.context >>
-#          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
-#          source-env: op.nonprod.env
-#          cluster: sandbox-ap-southeast-2
-#          filters: *on-push-main
-#
-#  update dashboard:
-#    jobs:
-#      - update-dashboard:
-#          name: update dashboard
-#          context: << pipeline.parameters.context >>
-#          shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
-#          filters: *on-push-main
 
   nightly-node-replacements:
     triggers:
@@ -358,9 +278,9 @@ workflows:
                 - main
     jobs:
       - replace-nodes:
-          name: nightly node replacement job on sandbox-ap-southeast-2
+          name: nightly node replacement job on nonprod-ap-southeast-2
           context: << pipeline.parameters.context >>
-          cluster: sandbox-ap-southeast-2
+          cluster: nonprod-ap-southeast-2
           source-env: op.nonprod.env
 
   # perform the pipeline health checks and compare desired eks component versions with current release versions
@@ -373,13 +293,9 @@ workflows:
               only:
                 - main
     jobs:
-#      - update-dashboard:
-#          name: update dashboard
-#          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
-#          context: << pipeline.parameters.context >>
       - validate-eks:
-          name: validate sandbox-ap-southeast-2 eks cluster
+          name: validate nonprod-ap-southeast-2 eks cluster
           context: << pipeline.parameters.context >>
           shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
           source-env: op.nonprod.env
-          cluster: sandbox-ap-southeast-2
+          cluster: nonprod-ap-southeast-2
